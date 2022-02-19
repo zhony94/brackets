@@ -1,25 +1,34 @@
-module.exports = function check(str) {
+module.exports = function check(str, bracketsConfig) {
+  const bracketsWithPair = []
+  const bracketsWithOutPair = []
+  const brackets = {}
   const holder = []
-  let count = 0
-  const BracketsSame = ['|','1','2','3','4','5','6','7','8']
-  const openBrackets = ['(','{','[']
-  const closedBrackets = [')','}',']']
-  for (let letter of str) {
-    if(BracketsSame.includes(letter)){
-      count = count + 1
-    }else{
-      if(openBrackets.includes(letter)){ 
-        holder.push(letter)
-      }else if(closedBrackets.includes(letter)){ 
-        const openPair = openBrackets[closedBrackets.indexOf(letter)] 
-        if(holder[holder.length - 1] === openPair){ 
-            holder.splice(-1,1) 
-        }else{ 
-            holder.push(letter)
-            break 
-        }
-      }
-    }        
+
+  for (let config of bracketsConfig ){
+    if (config[0] === config[1]){
+      bracketsWithOutPair.push(config[0])
+    } else {
+      bracketsWithPair.push(config[0])
+    }
+
+    brackets[config[1]] = config[0]
   }
-  return (holder.length === 0 && count%2 === 0) 
+
+  for (const element of str){
+    if (bracketsWithPair.includes(element)){
+      holder.push(element)
+    }else if(bracketsWithOutPair.includes(element)){
+      if(element === holder[holder.length-1]) {
+        holder.pop()
+      }else{
+        holder.push(element)
+      }
+    }else {
+      if (brackets[element] !== holder[holder.length-1]){
+        return false
+      }
+      holder.pop()
+    }
+  }
+  return (holder.length === 0)
 }
